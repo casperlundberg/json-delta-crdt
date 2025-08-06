@@ -32,5 +32,16 @@
   },
   "pre-commit": [
     "test"
-  ]
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crdt-ibm-research/json-delta-crdt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crdt-ibm-research/json-delta-crdt/issues"
+  },
+  "homepage": "https://github.com/crdt-ibm-research/json-delta-crdt#readme"
 }
