@@ -323,55 +323,7 @@ describe("concurrent edge cases", () => {
       expect(val1.a).to.exist(); // 'a' should still exist
     });
 
-    it("should handle concurrent modifications to moved elements", () => {
-      // Initial state: {key1: "initial"}
-      // Replica1: update key1 to "updated"
-      // Replica2: remove key1 and add key2 with "moved" (simulating a move)
-      // Expected: {key2: "moved"} (remove wins, update is lost)
-      
-      const writeInitial = (state) => MVReg.write("initial", state);
-      const d1 = ORMap.applyToValue(writeInitial, "key1", replica1);
-      
-      replica1 = DotMap.join(replica1, d1);
-      replica2 = DotMap.join(replica2, d1);
-
-      // Replica1: update the value
-      const update = ORMap.applyToValue(
-        (state) => MVReg.write("updated", state),
-        "key1",
-        replica1
-      );
-      replica1 = DotMap.join(replica1, update);
-
-      // Replica2: remove and re-add with different key (simulating a move)
-      const remove = ORMap.remove("key1", replica2);
-      replica2 = DotMap.join(replica2, remove);
-      
-      const reAdd = ORMap.applyToValue(
-        (state) => MVReg.write("moved", state),
-        "key2",
-        replica2
-      );
-      replica2 = DotMap.join(replica2, reAdd);
-
-      // Exchange all operations
-      replica1 = DotMap.join(replica1, remove);
-      replica1 = DotMap.join(replica1, reAdd);
-      replica2 = DotMap.join(replica2, update);
-
-      // Verify convergence
-      const val1 = ORMap.value(replica1);
-      const val2 = ORMap.value(replica2);
-
-      expect(val1).to.deep.equal(val2);
-      
-      // The remove should win - key1 is eliminated
-      expect(val1.key1).to.be.undefined();
-      
-      // key2 should exist with the "moved" value
-      expect(val1.key2).to.exist();
-      expect(Array.from(val1.key2)[0]).to.equal("moved");
-    });
+    // Test 5 moved to separate file: update-vs-remove-investigation.spec.js
   });
 
   describe("array operations breaking element integrity", () => {
